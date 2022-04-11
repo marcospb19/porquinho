@@ -14,6 +14,8 @@ pub enum Error {
     Parse(#[from] crate::parser::ParseError),
     #[error("Invalid UTF-8: {0}")]
     Utf8(#[from] std::str::Utf8Error),
+    #[error("Filesystem directory traversal error: {0}")]
+    Walkdir(#[from] walkdir::Error),
     #[error("Toml values are in ??? unexpected types: {description}. at {path}.")]
     InvalidTomlTypes { description: String, path: PathBuf },
 }

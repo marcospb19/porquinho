@@ -9,6 +9,11 @@ use crate::{
     parser::{Operation, OperationType},
 };
 
+pub enum StatusInfo {
+    Complete,
+    Summary,
+}
+
 #[allow(unused)]
 pub(super) struct BookkeeperStatus {
     /// Total amount spent.
@@ -65,17 +70,18 @@ impl BookkeeperStatus {
         println!("{}", output);
     }
 
-    fn display_value_table(&self) {
+    fn display_summary_table(&self, month: &str) {
         let balance = &self.put_total - &self.take_total;
 
         let table = {
-            let header = ["Incoming", "Outgoing", "Balance"];
+            let header = ["Month", "Incoming", "Outgoing", "Balance"];
             let header = table_header_from_column_names(&header);
 
             let rows = vec![
-                format!("R$ {:.2}", self.put_total),
-                format!("R$ {:.2}", self.take_total),
-                format!("R$ {:.2}", balance),
+                month.into(),
+                format!("{:8.2}", self.put_total),
+                format!("{:8.2}", self.take_total),
+                format!("{:7.2}", balance),
             ]
             .into_iter()
             .map(|x| StyledString::new(x, TextStyle::basic_left()))
@@ -110,9 +116,11 @@ impl BookkeeperStatus {
         self.display_table(&table);
     }
 
-    pub(super) fn display(&self) {
-        self.display_value_table();
-        self.display_operations_table();
+    pub(super) fn display(&self, status_info: StatusInfo, month: &str) {
+        self.display_summary_table(month);
+        if let StatusInfo::Complete = status_info {
+            self.display_operations_table();
+        }
     }
 
     pub(super) fn from_toml_table(table: &TomlTable) -> Result<Self> {

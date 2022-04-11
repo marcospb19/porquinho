@@ -2,15 +2,19 @@ mod status;
 
 use std::{
     io::{Read, Seek, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use fs_err as fs;
 use status::BookkeeperStatus;
+pub use status::StatusInfo;
 use toml::value::{Table as TomlTable, Value as TomlValue};
+use walkdir::WalkDir;
 
 use crate::{
+    current_file,
     error::{Error, Result, TomlTypeCheck, TomlTypeCheckDiagnosis},
+    fs_utils::{create_file_if_not_existent, Dirs},
     parser::Operation,
 };
 
@@ -23,15 +27,41 @@ pub struct Bookkeeper {
 }
 
 impl Bookkeeper {
-    pub fn display_status(&self) {
-        // Safety: Always has file name because it's in format "MM-YYYY"
-        println!("Status for {:?}", self.file_path.file_name().unwrap());
+    pub fn new_current() -> Result<Self> {
+        let dirs = Dirs::init()?;
+        let bk_path = dirs.path().join(current_file());
 
-        self.status.display();
+        Bookkeeper::load_from_path(bk_path)
+    }
+
+    pub fn new_all() -> Result<Vec<Self>> {
+        let dirs = Dirs::init()?;
+
+        let mut selfs = vec![];
+        // Skip the path itself
+        let walkdir = WalkDir::new(dirs.path()).into_iter().skip(1);
+
+        for entry in walkdir {
+            let entry = entry?;
+            let this = Self::load_from_path(entry.path())?;
+            selfs.push(this);
+        }
+
+        Ok(selfs)
+    }
+
+    pub fn display_status(&self, status_info: StatusInfo) {
+        // Safety: Always has file name because it's in format "MM-YYYY"
+        let file_name = self.file_path.file_name().unwrap();
+        let file_name = Path::new(file_name);
+        let file_name = format!("{}", file_name.display());
+
+        self.status.display(status_info, &file_name);
     }
 
     pub fn load_from_path(path: impl Into<PathBuf>) -> Result<Self> {
         let path = path.into();
+        create_file_if_not_existent(&path)?;
         let mut file = fs::OpenOptions::new().read(true).write(true).open(&path)?;
         let mut file_contents = String::new();
         file.read_to_string(&mut file_contents)?;

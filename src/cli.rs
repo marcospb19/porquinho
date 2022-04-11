@@ -30,5 +30,8 @@ pub enum Subcommand {
         description: String,
     },
     /// Current status for your account
-    Status,
+    Status {
+        #[clap(possible_values = &["current", "all"])]
+        target: Option<String>,
+    },
 }
