@@ -1,7 +1,8 @@
-use crate::wrap::{column_width, split_sublines, wrap, Alignment, Subline, WrappedCell};
+use std::{collections::HashMap, fmt::Write};
+
 use nu_ansi_term::{Color, Style};
-use std::collections::HashMap;
-use std::fmt::Write;
+
+use crate::wrap::{column_width, split_sublines, wrap, Alignment, Subline, WrappedCell};
 
 enum SeparatorPosition {
     Top,
@@ -614,7 +615,11 @@ impl Theme {
 
 impl Table {
     pub fn new(headers: Vec<StyledString>, data: Vec<Vec<StyledString>>, theme: Theme) -> Table {
-        Table { headers, data, theme }
+        Table {
+            headers,
+            data,
+            theme,
+        }
     }
 }
 
@@ -1202,7 +1207,9 @@ fn wrap_cells(
         WrappedCell {
             lines: vec![],
             max_width: 0,
-            style: TextStyle { ..Default::default() },
+            style: TextStyle {
+                ..Default::default()
+            },
         };
         output_headers.len()
     ];

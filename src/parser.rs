@@ -1,5 +1,4 @@
-use std::cmp::Ordering;
-use std::{ops::Not, str::FromStr};
+use std::{cmp::Ordering, ops::Not, str::FromStr};
 
 use bigdecimal::BigDecimal;
 
@@ -89,7 +88,12 @@ impl Operation {
 
         let description = parse_description(rest).into();
 
-        Ok(Self { day, kind, amount, description })
+        Ok(Self {
+            day,
+            kind,
+            amount,
+            description,
+        })
     }
 }
 

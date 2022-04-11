@@ -1,5 +1,6 @@
-use nu_table::{draw_table, StyledString, Table, TextStyle, Theme};
 use std::collections::HashMap;
+
+use nu_table::{draw_table, StyledString, Table, TextStyle, Theme};
 
 fn f((theme_name, theme): (&str, Theme)) {
     let args: Vec<_> = std::env::args().collect();

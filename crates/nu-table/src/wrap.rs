@@ -1,10 +1,10 @@
-use crate::table::TextStyle;
+use std::{borrow::Cow, collections::HashMap, fmt::Display, iter::Iterator};
+
 use ansi_cut::AnsiCut;
 use nu_ansi_term::Style;
-use std::borrow::Cow;
-use std::collections::HashMap;
-use std::{fmt::Display, iter::Iterator};
 use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
+
+use crate::table::TextStyle;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Alignment {
@@ -95,26 +95,28 @@ pub fn split_sublines(input: &str) -> Vec<Vec<Subline>> {
         .split_terminator('\n')
         .map(|line| {
             line.split_terminator(' ')
-                .map(|x| Subline {
-                    subline: x.to_string(),
-                    width: {
-                        // We've tried UnicodeWidthStr::width(x), UnicodeSegmentation::graphemes(x, true).count()
-                        // and x.chars().count() with all types of combinations. Currently, it appears that
-                        // getting the max of char count and Unicode width seems to produce the best layout.
-                        // However, it's not perfect.
-                        // let c = x.chars().count();
-                        // let u = UnicodeWidthStr::width(x);
-                        // std::cmp::min(c, u)
+                .map(|x| {
+                    Subline {
+                        subline: x.to_string(),
+                        width: {
+                            // We've tried UnicodeWidthStr::width(x), UnicodeSegmentation::graphemes(x, true).count()
+                            // and x.chars().count() with all types of combinations. Currently, it appears that
+                            // getting the max of char count and Unicode width seems to produce the best layout.
+                            // However, it's not perfect.
+                            // let c = x.chars().count();
+                            // let u = UnicodeWidthStr::width(x);
+                            // std::cmp::min(c, u)
 
-                        // let c = strip_ansi(x).chars().count();
-                        // let u = special_width(x);
-                        // std::cmp::max(c, u)
-                        let stripped = strip_ansi(x);
+                            // let c = strip_ansi(x).chars().count();
+                            // let u = special_width(x);
+                            // std::cmp::max(c, u)
+                            let stripped = strip_ansi(x);
 
-                        let c = stripped.chars().count();
-                        let u = stripped.width();
-                        std::cmp::max(c, u)
-                    },
+                            let c = stripped.chars().count();
+                            let u = stripped.width();
+                            std::cmp::max(c, u)
+                        },
+                    }
                 })
                 .collect::<Vec<_>>()
         })

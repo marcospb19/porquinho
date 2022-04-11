@@ -14,11 +14,9 @@ pub use crate::{
     bookkeeper::Bookkeeper,
     error::{Error, Result},
 };
-
 use crate::{
     cli::{Opts, Subcommand},
-    file::create_file_if_not_existent,
-    file::BookkeepingFile,
+    file::{create_file_if_not_existent, BookkeepingFile},
 };
 
 fn main() {
@@ -51,14 +49,23 @@ impl GlobalState {
 
     pub fn run_command(self) -> Result<()> {
         let day = Local::today().day() as u8;
-        let Self { cmd, mut bookkeeper } = self;
+        let Self {
+            cmd,
+            mut bookkeeper,
+        } = self;
 
         match cmd {
-            Subcommand::Take { amount, ref description } => {
+            Subcommand::Take {
+                amount,
+                ref description,
+            } => {
                 let operation = Operation::new(day, OperationType::Withdraw, amount, description);
                 bookkeeper.add_operation(operation)?;
             }
-            Subcommand::Put { amount, ref description } => {
+            Subcommand::Put {
+                amount,
+                ref description,
+            } => {
                 let operation = Operation::new(day, OperationType::Deposit, amount, description);
                 bookkeeper.add_operation(operation)?;
             }

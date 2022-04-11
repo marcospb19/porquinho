@@ -6,14 +6,13 @@ use std::{
 };
 
 use fs_err as fs;
+use status::BookkeeperStatus;
 use toml::value::{Table as TomlTable, Value as TomlValue};
 
 use crate::{
     error::{Error, Result, TomlTypeCheck, TomlTypeCheckDiagnosis},
     parser::Operation,
 };
-
-use status::BookkeeperStatus;
 
 pub struct Bookkeeper {
     pub file: fs::File,

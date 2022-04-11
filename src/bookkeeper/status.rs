@@ -1,6 +1,7 @@
+use std::collections::HashMap;
+
 use bigdecimal::BigDecimal;
 use nu_table::{draw_table, StyledString, Table, TextStyle, Theme};
-use std::collections::HashMap;
 use toml::value::Table as TomlTable;
 
 use crate::{
@@ -23,7 +24,12 @@ pub(super) struct BookkeeperStatus {
 }
 
 fn table_row_from_operation(operation: &Operation) -> Vec<StyledString> {
-    let Operation { day, kind, amount, description } = operation;
+    let Operation {
+        day,
+        kind,
+        amount,
+        description,
+    } = operation;
 
     let (kind_name, _) = kind.name_and_symbol();
 
