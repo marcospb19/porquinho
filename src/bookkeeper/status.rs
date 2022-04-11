@@ -60,7 +60,7 @@ fn table_header_from_column_names(column_names: &[&str]) -> Vec<StyledString> {
 
 impl BookkeeperStatus {
     fn display_table(&self, table: &Table) {
-        let screen_width = 150;
+        let screen_width = get_terminal_width();
 
         // Do not change any colors, yet.
         let colors = HashMap::new();
@@ -156,4 +156,11 @@ impl BookkeeperStatus {
             put_operations,
         })
     }
+}
+
+fn get_terminal_width() -> usize {
+    termion::terminal_size()
+        .map(|(width, _height)| width)
+        .expect("Could not get the terminal width")
+        .into()
 }

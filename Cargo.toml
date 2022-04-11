@@ -23,6 +23,7 @@ toml = "0.5.8"
 nu-table = { path = "crates/nu-table" }
 nu-ansi-term = "0.42.0"
 walkdir = "2.3.2"
+termion = "1.5.6"
 
 [dev-dependencies]
 tempfile = "3.3.0"
