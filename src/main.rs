@@ -46,9 +46,11 @@ fn run() -> Result<()> {
 
             match target.as_str() {
                 "all" => {
-                    for bookkeeper in Bookkeeper::new_all()? {
-                        bookkeeper.display_status(StatusInfo::Summary);
-                    }
+                    let rows = Bookkeeper::new_all()?
+                        .into_iter()
+                        .map(Bookkeeper::into_status)
+                        .collect();
+                    Bookkeeper::display_summaries(rows);
                 }
                 "current" => Bookkeeper::new_current()?.display_status(StatusInfo::Complete),
                 _ => unreachable!(),

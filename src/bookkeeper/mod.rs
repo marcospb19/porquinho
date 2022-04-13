@@ -6,8 +6,7 @@ use std::{
 };
 
 use fs_err as fs;
-use status::BookkeeperStatus;
-pub use status::StatusInfo;
+pub use status::{BookkeeperStatus, StatusInfo};
 use toml::value::{Table as TomlTable, Value as TomlValue};
 use walkdir::WalkDir;
 
@@ -27,6 +26,14 @@ pub struct Bookkeeper {
 }
 
 impl Bookkeeper {
+    pub fn display_summaries(status: Vec<BookkeeperStatus>) {
+        BookkeeperStatus::display_summaries(status);
+    }
+
+    pub fn into_status(self) -> BookkeeperStatus {
+        self.status
+    }
+
     pub fn new_current() -> Result<Self> {
         let dirs = Dirs::init()?;
         let bk_path = dirs.path().join(current_file());
@@ -77,7 +84,10 @@ impl Bookkeeper {
             });
         }
 
-        let status = Self::status_from_toml_table(&table)?;
+        let status = Self::status_from_toml_table_and_month(
+            &table,
+            path.file_name().unwrap().to_str().unwrap(),
+        )?;
 
         Ok(Self {
             file,
@@ -124,8 +134,11 @@ impl Bookkeeper {
         unwrap_toml_table(toml)
     }
 
-    fn status_from_toml_table(table: &TomlTable) -> Result<BookkeeperStatus> {
-        BookkeeperStatus::from_toml_table(table)
+    fn status_from_toml_table_and_month(
+        table: &TomlTable,
+        month: &str,
+    ) -> Result<BookkeeperStatus> {
+        BookkeeperStatus::from_toml_table(table, month)
     }
 }
 
